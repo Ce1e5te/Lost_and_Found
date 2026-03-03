@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>校园失物招领平台</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <header class="lf-header">
+      <div class="lf-header__title">
+        <span class="lf-logo">Lost &amp; Found</span>
+        <h1>校园失物招领平台</h1>
+        <p>帮助同学快速找回遗失物品 · 传递善意</p>
+      </div>
+    </header>
+
+    <main class="lf-main">
+      <section class="lf-layout">
+        <aside class="lf-sidebar">
+          <nav class="lf-nav">
+            <button class="lf-nav__item lf-nav__item--active" data-tab="lost">
+              失物信息
+            </button>
+            <button class="lf-nav__item" data-tab="found">
+              招领信息
+            </button>
+            <button class="lf-nav__item" data-tab="publish">
+              发布启事
+            </button>
+          </nav>
+
+          <div class="lf-filter">
+            <h3>快速筛选</h3>
+            <label class="lf-field">
+              <span>物品类别</span>
+              <select id="filter-category">
+                <option value="">全部</option>
+                <option value="card">校园卡 / 证件</option>
+                <option value="digital">电子产品</option>
+                <option value="daily">日常用品</option>
+                <option value="other">其他</option>
+              </select>
+            </label>
+            <label class="lf-field">
+              <span>关键字</span>
+              <input
+                id="filter-keyword"
+                type="text"
+                placeholder="例如：一卡通、雨伞"
+              />
+            </label>
+            <button id="filter-button" class="lf-button lf-button--secondary">
+              应用筛选
+            </button>
+          </div>
+        </aside>
+
+        <section class="lf-content">
+          <section id="tab-lost" class="lf-tab lf-tab--active">
+            <div class="lf-tab__header">
+              <h2>最新失物信息</h2>
+              <p>如果你捡到了以下物品，请主动联系失主。</p>
+            </div>
+            <div id="lost-list" class="lf-card-list"></div>
+          </section>
+
+          <section id="tab-found" class="lf-tab">
+            <div class="lf-tab__header">
+              <h2>最新招领信息</h2>
+              <p>感谢每一位拾金不昧的同学。</p>
+            </div>
+            <div id="found-list" class="lf-card-list"></div>
+          </section>
+
+          <section id="tab-publish" class="lf-tab">
+            <div class="lf-tab__header">
+              <h2>发布失物 / 招领启事</h2>
+              <p>请尽可能填写完整信息，方便他人快速确认。</p>
+            </div>
+            <form id="publish-form" class="lf-form">
+              <div class="lf-form__grid">
+                <label class="lf-field">
+                  <span>信息类型</span>
+                  <select name="type" required>
+                    <option value="lost">我丢了东西（寻物）</option>
+                    <option value="found">我捡到东西（招领）</option>
+                  </select>
+                </label>
+
+                <label class="lf-field">
+                  <span>物品名称</span>
+                  <input
+                    name="title"
+                    type="text"
+                    placeholder="如：黑色校园卡、蓝色雨伞"
+                    required
+                  />
+                </label>
+
+                <label class="lf-field">
+                  <span>物品类别</span>
+                  <select name="category" required>
+                    <option value="card">校园卡 / 证件</option>
+                    <option value="digital">电子产品</option>
+                    <option value="daily">日常用品</option>
+                    <option value="other">其他</option>
+                  </select>
+                </label>
+
+                <label class="lf-field">
+                  <span>时间</span>
+                  <input name="time" type="date" required />
+                </label>
+
+                <label class="lf-field lf-field--full">
+                  <span>地点</span>
+                  <input
+                    name="location"
+                    type="text"
+                    placeholder="如：图书馆三楼自习区、食堂一层"
+                    required
+                  />
+                </label>
+
+                <label class="lf-field lf-field--full">
+                  <span>详细描述</span>
+                  <textarea
+                    name="description"
+                    rows="3"
+                    placeholder="外观特征、袋子颜色、特殊标记等"
+                  ></textarea>
+                </label>
+
+                <label class="lf-field lf-field--full">
+                  <span>物品照片（可选，仅本地预览）</span>
+                  <input
+                    id="image-input"
+                    name="image"
+                    type="file"
+                    accept="image/*"
+                  />
+                </label>
+
+                <label class="lf-field">
+                  <span>联系人</span>
+                  <input
+                    name="contactName"
+                    type="text"
+                    placeholder="姓名或昵称"
+                    required
+                  />
+                </label>
+
+                <label class="lf-field">
+                  <span>联系方式</span>
+                  <input
+                    name="contact"
+                    type="text"
+                    placeholder="手机号 / 微信 / QQ"
+                    required
+                  />
+                </label>
+              </div>
+
+              <div class="lf-form__actions">
+                <button type="submit" class="lf-button">发布信息</button>
+                <span id="publish-message" class="lf-form__message"></span>
+              </div>
+            </form>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <footer class="lf-footer">
+      <span>校园失物招领系统 · 前端示例页面</span>
+    </footer>
+
+    <!-- 悬浮上传按钮 -->
+    <button class="lf-fab" title="上传/发布信息">
+      <span class="lf-fab__icon">＋</span>
+    </button>
+
+    <script src="./src/main.js"></script>
+  </body>
+</html>
+
