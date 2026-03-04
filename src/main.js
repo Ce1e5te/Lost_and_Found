@@ -1,3 +1,116 @@
+// 用户管理系统
+class UserManager {
+  constructor() {
+    this.currentUser = null;
+    this.init();
+  }
+
+  init() {
+    this.checkLoginStatus();
+    this.bindLogoutEvent();
+  }
+
+  checkLoginStatus() {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      this.currentUser = JSON.parse(savedUser);
+      this.showUserInfo();
+    } else {
+      this.showLoginPrompt();
+    }
+  }
+
+  showUserInfo() {
+    const userInfo = document.getElementById('user-info');
+    const loginPrompt = document.getElementById('login-prompt');
+    const userName = document.getElementById('user-name');
+    const userType = document.getElementById('user-type');
+
+    if (this.currentUser) {
+      userInfo.style.display = 'flex';
+      loginPrompt.style.display = 'none';
+      userName.textContent = this.currentUser.name;
+      userType.textContent = this.getUserTypeText(this.currentUser.userType);
+    }
+  }
+
+  showLoginPrompt() {
+    const userInfo = document.getElementById('user-info');
+    const loginPrompt = document.getElementById('login-prompt');
+
+    userInfo.style.display = 'none';
+    loginPrompt.style.display = 'flex';
+  }
+
+  getUserTypeText(type) {
+    switch (type) {
+      case 'student':
+        return '在校学生';
+      case 'admin':
+        return '管理员';
+      default:
+        return '普通用户';
+    }
+  }
+
+  bindLogoutEvent() {
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        this.logout();
+      });
+    }
+  }
+
+  logout() {
+    localStorage.removeItem('currentUser');
+    this.currentUser = null;
+    this.showLoginPrompt();
+    
+    // 可选：显示退出成功消息
+    this.showMessage('已退出登录', 'success');
+  }
+
+  showMessage(message, type) {
+    // 创建临时消息元素
+    const messageEl = document.createElement('div');
+    messageEl.className = `toast-message toast-${type}`;
+    messageEl.textContent = message;
+    messageEl.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      background: ${type === 'success' ? 'var(--success)' : 'var(--danger)'};
+      color: white;
+      border-radius: var(--radius-md);
+      z-index: 10000;
+      animation: slideInRight 0.3s ease-out;
+    `;
+
+    document.body.appendChild(messageEl);
+
+    setTimeout(() => {
+      messageEl.remove();
+    }, 3000);
+  }
+
+  getCurrentUser() {
+    return this.currentUser;
+  }
+
+  isLoggedIn() {
+    return this.currentUser !== null;
+  }
+
+  isAdmin() {
+    return this.currentUser && this.currentUser.userType === 'admin';
+  }
+}
+
+// 创建用户管理实例
+const userManager = new UserManager();
+
 // 简单的前端数据模拟（实际项目中可由后端接口返回）
 const mockLostList = [
   {
@@ -171,6 +284,17 @@ function bindForm(lostList, foundList) {
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+    
+    // 检查用户是否已登录
+    if (!userManager.isLoggedIn()) {
+      userManager.showMessage('请先登录后再发布信息', 'error');
+      // 跳转到登录页面
+      setTimeout(() => {
+        window.location.href = './login.html';
+      }, 1500);
+      return;
+    }
+
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
     const file = formData.get("image");
@@ -187,6 +311,11 @@ function bindForm(lostList, foundList) {
         contactName: data.contactName,
         contact: data.contact,
         image: imageDataUrl || null,
+        // 添加发布者信息
+        publisherId: userManager.getCurrentUser().id,
+        publisherName: userManager.getCurrentUser().name,
+        publisherType: userManager.getCurrentUser().userType,
+        publishTime: new Date().toISOString()
       };
 
       if (data.type === "lost") {

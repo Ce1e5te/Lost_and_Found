@@ -8,10 +8,25 @@
   </head>
   <body>
     <header class="lf-header">
-      <div class="lf-header__title">
-        <span class="lf-logo">Lost &amp; Found</span>
-        <h1>校园失物招领平台</h1>
-        <p>帮助同学快速找回遗失物品 · 传递善意</p>
+      <div class="lf-header__content">
+        <div class="lf-header__title">
+          <span class="lf-logo">Lost &amp; Found</span>
+          <h1>校园失物招领平台</h1>
+          <p>帮助同学快速找回遗失物品 · 传递善意</p>
+        </div>
+      </div>
+      <div class="lf-header__user">
+        <div id="user-info" class="user-info" style="display: none;">
+          <span class="user-avatar">👤</span>
+          <div class="user-details">
+            <div class="user-name" id="user-name"></div>
+            <div class="user-type" id="user-type"></div>
+          </div>
+          <button id="logout-btn" class="logout-btn">退出</button>
+        </div>
+        <div id="login-prompt" class="login-prompt">
+          <a href="./login.html" class="login-link">登录</a>
+        </div>
       </div>
     </header>
 
