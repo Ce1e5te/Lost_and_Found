@@ -10,6 +10,7 @@ const mockLostList = [
     description: "一卡通背面贴有蓝色贴纸，姓李。",
     contactName: "张同学",
     contact: "微信：zhangxx",
+    image: "https://picsum.photos/seed/campus-card/400/300.jpg"
   },
   {
     id: 2,
@@ -21,6 +22,7 @@ const mockLostList = [
     description: "金士顿 32G，里面有课程作业。",
     contactName: "王同学",
     contact: "电话：188xxxx0001",
+    image: "https://picsum.photos/seed/usb-drive/400/300.jpg"
   },
 ];
 
@@ -35,6 +37,7 @@ const mockFoundList = [
     description: "放在门口台阶上，无明显标记。",
     contactName: "李同学",
     contact: "QQ：123456",
+    image: "https://picsum.photos/seed/blue-umbrella/400/300.jpg"
   },
   {
     id: 4,
@@ -46,16 +49,18 @@ const mockFoundList = [
     description: "已交至校警务室，可凭证认领。",
     contactName: "校警务室",
     contact: "电话：010-xxxx0000",
+    image: "https://picsum.photos/seed/student-id/400/300.jpg"
   },
 ];
 
 function createCard(item) {
   const el = document.createElement("article");
   el.className = "lf-card";
+  el.style.cursor = "pointer";
 
   el.innerHTML = `
     ${
-      item.type === "found" && item.image
+      item.image
         ? `<img class="lf-card__image" src="${item.image}" alt="物品照片" />`
         : ""
     }
@@ -76,6 +81,9 @@ function createCard(item) {
       <span>${item.contact}</span>
     </p>
   `;
+
+  // 添加点击事件
+  el.addEventListener('click', () => showDetailModal(item));
 
   return el;
 }
@@ -224,6 +232,74 @@ function bindForm(lostList, foundList) {
       }
     });
   }
+}
+
+// 显示详情弹窗
+function showDetailModal(item) {
+  const modal = document.getElementById('detail-modal');
+  const overlay = modal.querySelector('.lf-modal__overlay');
+  const closeBtn = modal.querySelector('.lf-modal__close');
+  
+  // 填充数据
+  const modalImage = document.getElementById('modal-image');
+  const modalBadge = document.getElementById('modal-badge');
+  const modalTitle = document.getElementById('modal-title');
+  const modalTime = document.getElementById('modal-time');
+  const modalLocation = document.getElementById('modal-location');
+  const modalCategory = document.getElementById('modal-category');
+  const modalDescription = document.getElementById('modal-description');
+  const modalContactName = document.getElementById('modal-contact-name');
+  const modalContact = document.getElementById('modal-contact');
+  
+  // 设置图片（如果没有图片则隐藏）
+  if (item.image) {
+    modalImage.src = item.image;
+    modalImage.style.display = 'block';
+  } else {
+    modalImage.style.display = 'none';
+  }
+  
+  // 设置徽章
+  modalBadge.textContent = item.type === 'lost' ? '寻物' : '招领';
+  modalBadge.className = `lf-modal__badge lf-modal__badge--${item.type}`;
+  
+  // 设置其他信息
+  modalTitle.textContent = item.title;
+  modalTime.textContent = item.time;
+  modalLocation.textContent = item.location;
+  modalCategory.textContent = mapCategory(item.category);
+  modalDescription.textContent = item.description || '（无详细描述）';
+  modalContactName.textContent = item.contactName;
+  modalContact.textContent = item.contact;
+  
+  // 显示弹窗
+  modal.classList.add('lf-modal--show');
+  document.body.style.overflow = 'hidden';
+  
+  // 关闭弹窗的函数
+  const closeModal = () => {
+    modal.classList.remove('lf-modal--show');
+    document.body.style.overflow = '';
+  };
+  
+  // 移除之前的事件监听器（避免重复绑定）
+  const newOverlay = overlay.cloneNode(true);
+  const newCloseBtn = closeBtn.cloneNode(true);
+  overlay.parentNode.replaceChild(newOverlay, overlay);
+  closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+  
+  // 添加新的事件监听器
+  newOverlay.addEventListener('click', closeModal);
+  newCloseBtn.addEventListener('click', closeModal);
+  
+  // ESC键关闭
+  const handleEsc = (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      document.removeEventListener('keydown', handleEsc);
+    }
+  };
+  document.addEventListener('keydown', handleEsc);
 }
 
 window.addEventListener("DOMContentLoaded", () => {
