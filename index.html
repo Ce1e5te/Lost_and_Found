@@ -8,10 +8,25 @@
   </head>
   <body>
     <header class="lf-header">
-      <div class="lf-header__title">
-        <span class="lf-logo">Lost &amp; Found</span>
-        <h1>校园失物招领平台</h1>
-        <p>帮助同学快速找回遗失物品 · 传递善意</p>
+      <div class="lf-header__content">
+        <div class="lf-header__title">
+          <span class="lf-logo">Lost &amp; Found</span>
+          <h1>校园失物招领平台</h1>
+          <p>帮助同学快速找回遗失物品 · 传递善意</p>
+        </div>
+      </div>
+      <div class="lf-header__user">
+        <div id="user-info" class="user-info" style="display: none;">
+          <span class="user-avatar">👤</span>
+          <div class="user-details">
+            <div class="user-name" id="user-name"></div>
+            <div class="user-type" id="user-type"></div>
+          </div>
+          <button id="logout-btn" class="logout-btn">退出</button>
+        </div>
+        <div id="login-prompt" class="login-prompt">
+          <a href="./login.html" class="login-link">登录</a>
+        </div>
       </div>
     </header>
 
@@ -181,6 +196,37 @@
     <button class="lf-fab" title="上传/发布信息">
       <span class="lf-fab__icon">＋</span>
     </button>
+
+    <!-- 详情弹窗 -->
+    <div id="detail-modal" class="lf-modal">
+      <div class="lf-modal__overlay"></div>
+      <div class="lf-modal__content">
+        <button class="lf-modal__close" title="关闭">×</button>
+        <div class="lf-modal__body">
+          <div class="lf-modal__image-container">
+            <img id="modal-image" class="lf-modal__image" src="" alt="物品照片" />
+          </div>
+          <div class="lf-modal__info">
+            <div id="modal-badge" class="lf-modal__badge"></div>
+            <h2 id="modal-title" class="lf-modal__title"></h2>
+            <div class="lf-modal__meta">
+              <p><strong>时间：</strong><span id="modal-time"></span></p>
+              <p><strong>地点：</strong><span id="modal-location"></span></p>
+              <p><strong>类别：</strong><span id="modal-category"></span></p>
+            </div>
+            <div class="lf-modal__description">
+              <h3>详细描述</h3>
+              <p id="modal-description"></p>
+            </div>
+            <div class="lf-modal__contact">
+              <h3>联系方式</h3>
+              <p><strong>联系人：</strong><span id="modal-contact-name"></span></p>
+              <p><strong>联系方式：</strong><span id="modal-contact"></span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="./src/main.js"></script>
   </body>

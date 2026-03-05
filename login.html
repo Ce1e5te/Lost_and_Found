@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>登录 - 校园失物招领平台</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./src/styles.css" />
+    <link rel="stylesheet" href="./src/login.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <!-- 头部 -->
+        <header class="login-header">
+          <div class="login-logo">
+            <span class="lf-logo">Lost & Found</span>
+          </div>
+          <h1>校园失物招领平台</h1>
+          <p>请选择登录方式</p>
+        </header>
+
+        <!-- 登录方式切换 -->
+        <div class="login-method-toggle">
+          <button type="button" class="toggle-btn active" data-method="phone">手机号登录</button>
+          <button type="button" class="toggle-btn" data-method="password">账号密码登录</button>
+        </div>
+
+        <!-- 登录表单 -->
+        <form id="login-form" class="login-form">
+          <!-- 手机号登录表单 -->
+          <div id="phone-login" class="login-method">
+            <div class="form-group">
+              <label for="phone">手机号码</label>
+              <input
+                id="phone"
+                type="tel"
+                placeholder="请输入手机号码"
+                pattern="^1[3-9]\d{9}$"
+                maxlength="11"
+                required
+              />
+              <span class="form-hint">请输入11位手机号码</span>
+            </div>
+
+            <div class="form-group">
+              <label for="verification-code">验证码</label>
+              <div class="verification-group">
+                <input
+                  id="verification-code"
+                  type="text"
+                  placeholder="请输入验证码"
+                  maxlength="6"
+                  required
+                />
+                <button type="button" id="send-code" class="send-code-btn">
+                  发送验证码
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 账号密码登录表单 -->
+          <div id="password-login" class="login-method" style="display: none;">
+            <div class="form-group">
+              <label for="username">账号</label>
+              <input
+                id="username"
+                type="text"
+                placeholder="请输入学号或手机号"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password">密码</label>
+              <input
+                id="password"
+                type="password"
+                placeholder="请输入密码"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="remember-password">
+                <span class="checkmark"></span>
+                记住密码
+              </label>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="login-btn" disabled>
+              登录
+            </button>
+          </div>
+
+          <div id="login-message" class="login-message"></div>
+        </form>
+
+        <!-- 底部信息 -->
+        <footer class="login-footer">
+          <div class="register-prompt">
+            <span>还未注册？</span>
+            <a href="#" onclick="showRegister()" class="register-link">点击此处注册</a>
+          </div>
+          
+          <!-- 管理员入口 -->
+          <div class="admin-entry">
+            <span class="admin-link" onclick="toggleAdminLogin()">管理员登录</span>
+            <div id="admin-login-section" class="admin-login-section" style="display: none;">
+              <label class="user-type-option admin-option">
+                <input type="radio" name="userType" value="admin" />
+                <div class="option-card admin-card">
+                  <div class="option-icon">👮‍♂️</div>
+                  <div class="option-title">管理员</div>
+                  <div class="option-desc">管理平台信息和用户</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <p>首次登录将自动注册账户</p>
+          <p>登录即表示同意 <a href="#">用户协议</a> 和 <a href="#">隐私政策</a></p>
+        </footer>
+      </div>
+    </div>
+
+    <!-- 注册弹窗 -->
+    <div id="register-modal" class="lf-modal" style="display: none;">
+      <div class="lf-modal__overlay" onclick="hideRegister()"></div>
+      <div class="lf-modal__content register-modal-content">
+        <button class="lf-modal__close" onclick="hideRegister()" title="关闭">×</button>
+        <div class="register-form">
+          <h2>学生注册</h2>
+          <form id="student-register-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-student-id">学号</label>
+                <input id="reg-student-id" type="text" placeholder="请输入学号" required />
+              </div>
+              <div class="form-group">
+                <label for="reg-phone">手机号码</label>
+                <input id="reg-phone" type="tel" placeholder="请输入手机号码" pattern="^1[3-9]\d{9}$" maxlength="11" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-password">登录密码</label>
+                <input id="reg-password" type="password" placeholder="请设置登录密码（6-20位）" minlength="6" maxlength="20" required />
+              </div>
+              <div class="form-group">
+                <label for="reg-confirm-password">确认密码</label>
+                <input id="reg-confirm-password" type="password" placeholder="请再次输入密码" minlength="6" maxlength="20" required />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="register-btn">注册</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="./src/login.js"></script>
+    <script>
+      // 切换管理员登录
+      function toggleAdminLogin() {
+        const adminSection = document.getElementById('admin-login-section');
+        const adminLink = document.querySelector('.admin-link');
+        
+        if (adminSection.style.display === 'none') {
+          adminSection.style.display = 'block';
+          adminLink.textContent = '取消管理员登录';
+        } else {
+          adminSection.style.display = 'none';
+          adminLink.textContent = '管理员登录';
+        }
+      }
+
+      // 显示注册弹窗
+      function showRegister() {
+        document.getElementById('register-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+
+      // 隐藏注册弹窗
+      function hideRegister() {
+        if (window.loginSystem) {
+          window.loginSystem.hideRegisterModal();
+        } else {
+          document.getElementById('register-modal').style.display = 'none';
+          document.body.style.overflow = '';
+        }
+      }
+    </script>
+  </body>
+</html>

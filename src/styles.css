@@ -31,11 +31,110 @@ body {
 }
 
 .lf-header {
-  padding: 32px 20px 12px;
-  display: flex;
-  justify-content: center;
+  padding: 24px 20px 16px;
+  position: relative;
   background: radial-gradient(circle at 0 0, #22c55e22 0, transparent 55%),
     radial-gradient(circle at 100% 0, #38bdf833 0, transparent 45%);
+}
+
+.lf-header__content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.lf-header__title {
+  text-align: center;
+  max-width: 600px;
+}
+
+.lf-header__user {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+}
+
+.user-avatar {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  border-radius: 50%;
+  color: white;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.user-type {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.logout-btn {
+  padding: 6px 12px;
+  background: rgba(249, 115, 115, 0.1);
+  border: 1px solid rgba(249, 115, 115, 0.3);
+  border-radius: var(--radius-md);
+  color: var(--danger);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(249, 115, 115, 0.2);
+  transform: translateY(-1px);
+}
+
+.login-prompt {
+  display: flex;
+  align-items: center;
+}
+
+.login-link {
+  padding: 8px 20px;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.login-link:hover {
+  background: #0ea5e9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
 }
 
 .lf-header__title {
@@ -422,6 +521,200 @@ body {
   color: var(--success);
 }
 
+/* 详情弹窗样式 */
+.lf-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.lf-modal--show {
+  display: flex;
+}
+
+.lf-modal__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+}
+
+.lf-modal__content {
+  position: relative;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  max-width: 800px;
+  max-height: 90vh;
+  width: 100%;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.lf-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  background: rgba(248, 249, 250, 0.1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  color: var(--text-main);
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.lf-modal__close:hover {
+  background: rgba(248, 249, 250, 0.2);
+  transform: scale(1.1);
+}
+
+.lf-modal__body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.lf-modal__image-container {
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  min-height: 300px;
+}
+
+.lf-modal__image {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+}
+
+.lf-modal__info {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lf-modal__badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: fit-content;
+}
+
+.lf-modal__badge--lost {
+  background: rgba(249, 115, 115, 0.2);
+  color: var(--danger);
+  border: 1px solid rgba(249, 115, 115, 0.3);
+}
+
+.lf-modal__badge--found {
+  background: rgba(74, 222, 128, 0.2);
+  color: var(--success);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.lf-modal__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.lf-modal__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: rgba(56, 189, 248, 0.05);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.lf-modal__meta p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.lf-modal__description h3,
+.lf-modal__contact h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.lf-modal__description p,
+.lf-modal__contact p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.lf-modal__contact p:last-child {
+  margin-bottom: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .lf-modal__body {
+    grid-template-columns: 1fr;
+  }
+  
+  .lf-modal__image-container {
+    min-height: 200px;
+  }
+  
+  .lf-modal__info {
+    padding: 20px;
+  }
+  
+  .lf-modal__content {
+    margin: 10px;
+    max-height: 95vh;
+  }
+}
+
+/* 原有样式继续 */
 .lf-footer {
   padding: 12px 16px 18px;
   text-align: center;

@@ -1,3 +1,116 @@
+// 用户管理系统
+class UserManager {
+  constructor() {
+    this.currentUser = null;
+    this.init();
+  }
+
+  init() {
+    this.checkLoginStatus();
+    this.bindLogoutEvent();
+  }
+
+  checkLoginStatus() {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      this.currentUser = JSON.parse(savedUser);
+      this.showUserInfo();
+    } else {
+      this.showLoginPrompt();
+    }
+  }
+
+  showUserInfo() {
+    const userInfo = document.getElementById('user-info');
+    const loginPrompt = document.getElementById('login-prompt');
+    const userName = document.getElementById('user-name');
+    const userType = document.getElementById('user-type');
+
+    if (this.currentUser) {
+      userInfo.style.display = 'flex';
+      loginPrompt.style.display = 'none';
+      userName.textContent = this.currentUser.name;
+      userType.textContent = this.getUserTypeText(this.currentUser.userType);
+    }
+  }
+
+  showLoginPrompt() {
+    const userInfo = document.getElementById('user-info');
+    const loginPrompt = document.getElementById('login-prompt');
+
+    userInfo.style.display = 'none';
+    loginPrompt.style.display = 'flex';
+  }
+
+  getUserTypeText(type) {
+    switch (type) {
+      case 'student':
+        return '在校学生';
+      case 'admin':
+        return '管理员';
+      default:
+        return '普通用户';
+    }
+  }
+
+  bindLogoutEvent() {
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        this.logout();
+      });
+    }
+  }
+
+  logout() {
+    localStorage.removeItem('currentUser');
+    this.currentUser = null;
+    this.showLoginPrompt();
+    
+    // 可选：显示退出成功消息
+    this.showMessage('已退出登录', 'success');
+  }
+
+  showMessage(message, type) {
+    // 创建临时消息元素
+    const messageEl = document.createElement('div');
+    messageEl.className = `toast-message toast-${type}`;
+    messageEl.textContent = message;
+    messageEl.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      background: ${type === 'success' ? 'var(--success)' : 'var(--danger)'};
+      color: white;
+      border-radius: var(--radius-md);
+      z-index: 10000;
+      animation: slideInRight 0.3s ease-out;
+    `;
+
+    document.body.appendChild(messageEl);
+
+    setTimeout(() => {
+      messageEl.remove();
+    }, 3000);
+  }
+
+  getCurrentUser() {
+    return this.currentUser;
+  }
+
+  isLoggedIn() {
+    return this.currentUser !== null;
+  }
+
+  isAdmin() {
+    return this.currentUser && this.currentUser.userType === 'admin';
+  }
+}
+
+// 创建用户管理实例
+const userManager = new UserManager();
+
 // 简单的前端数据模拟（实际项目中可由后端接口返回）
 const mockLostList = [
   {
@@ -10,6 +123,7 @@ const mockLostList = [
     description: "一卡通背面贴有蓝色贴纸，姓李。",
     contactName: "张同学",
     contact: "微信：zhangxx",
+    image: "https://picsum.photos/seed/campus-card/400/300.jpg"
   },
   {
     id: 2,
@@ -21,6 +135,7 @@ const mockLostList = [
     description: "金士顿 32G，里面有课程作业。",
     contactName: "王同学",
     contact: "电话：188xxxx0001",
+    image: "https://picsum.photos/seed/usb-drive/400/300.jpg"
   },
 ];
 
@@ -35,6 +150,7 @@ const mockFoundList = [
     description: "放在门口台阶上，无明显标记。",
     contactName: "李同学",
     contact: "QQ：123456",
+    image: "https://picsum.photos/seed/blue-umbrella/400/300.jpg"
   },
   {
     id: 4,
@@ -46,16 +162,18 @@ const mockFoundList = [
     description: "已交至校警务室，可凭证认领。",
     contactName: "校警务室",
     contact: "电话：010-xxxx0000",
+    image: "https://picsum.photos/seed/student-id/400/300.jpg"
   },
 ];
 
 function createCard(item) {
   const el = document.createElement("article");
   el.className = "lf-card";
+  el.style.cursor = "pointer";
 
   el.innerHTML = `
     ${
-      item.type === "found" && item.image
+      item.image
         ? `<img class="lf-card__image" src="${item.image}" alt="物品照片" />`
         : ""
     }
@@ -76,6 +194,9 @@ function createCard(item) {
       <span>${item.contact}</span>
     </p>
   `;
+
+  // 添加点击事件
+  el.addEventListener('click', () => showDetailModal(item));
 
   return el;
 }
@@ -163,6 +284,17 @@ function bindForm(lostList, foundList) {
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+    
+    // 检查用户是否已登录
+    if (!userManager.isLoggedIn()) {
+      userManager.showMessage('请先登录后再发布信息', 'error');
+      // 跳转到登录页面
+      setTimeout(() => {
+        window.location.href = './login.html';
+      }, 1500);
+      return;
+    }
+
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
     const file = formData.get("image");
@@ -179,6 +311,11 @@ function bindForm(lostList, foundList) {
         contactName: data.contactName,
         contact: data.contact,
         image: imageDataUrl || null,
+        // 添加发布者信息
+        publisherId: userManager.getCurrentUser().id,
+        publisherName: userManager.getCurrentUser().name,
+        publisherType: userManager.getCurrentUser().userType,
+        publishTime: new Date().toISOString()
       };
 
       if (data.type === "lost") {
@@ -224,6 +361,74 @@ function bindForm(lostList, foundList) {
       }
     });
   }
+}
+
+// 显示详情弹窗
+function showDetailModal(item) {
+  const modal = document.getElementById('detail-modal');
+  const overlay = modal.querySelector('.lf-modal__overlay');
+  const closeBtn = modal.querySelector('.lf-modal__close');
+  
+  // 填充数据
+  const modalImage = document.getElementById('modal-image');
+  const modalBadge = document.getElementById('modal-badge');
+  const modalTitle = document.getElementById('modal-title');
+  const modalTime = document.getElementById('modal-time');
+  const modalLocation = document.getElementById('modal-location');
+  const modalCategory = document.getElementById('modal-category');
+  const modalDescription = document.getElementById('modal-description');
+  const modalContactName = document.getElementById('modal-contact-name');
+  const modalContact = document.getElementById('modal-contact');
+  
+  // 设置图片（如果没有图片则隐藏）
+  if (item.image) {
+    modalImage.src = item.image;
+    modalImage.style.display = 'block';
+  } else {
+    modalImage.style.display = 'none';
+  }
+  
+  // 设置徽章
+  modalBadge.textContent = item.type === 'lost' ? '寻物' : '招领';
+  modalBadge.className = `lf-modal__badge lf-modal__badge--${item.type}`;
+  
+  // 设置其他信息
+  modalTitle.textContent = item.title;
+  modalTime.textContent = item.time;
+  modalLocation.textContent = item.location;
+  modalCategory.textContent = mapCategory(item.category);
+  modalDescription.textContent = item.description || '（无详细描述）';
+  modalContactName.textContent = item.contactName;
+  modalContact.textContent = item.contact;
+  
+  // 显示弹窗
+  modal.classList.add('lf-modal--show');
+  document.body.style.overflow = 'hidden';
+  
+  // 关闭弹窗的函数
+  const closeModal = () => {
+    modal.classList.remove('lf-modal--show');
+    document.body.style.overflow = '';
+  };
+  
+  // 移除之前的事件监听器（避免重复绑定）
+  const newOverlay = overlay.cloneNode(true);
+  const newCloseBtn = closeBtn.cloneNode(true);
+  overlay.parentNode.replaceChild(newOverlay, overlay);
+  closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+  
+  // 添加新的事件监听器
+  newOverlay.addEventListener('click', closeModal);
+  newCloseBtn.addEventListener('click', closeModal);
+  
+  // ESC键关闭
+  const handleEsc = (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      document.removeEventListener('keydown', handleEsc);
+    }
+  };
+  document.addEventListener('keydown', handleEsc);
 }
 
 window.addEventListener("DOMContentLoaded", () => {
